@@ -39,7 +39,7 @@ export async function sendVerificationCode(
     : "Someone just signed in to your flnt account. Enter the confirmation code below to continue.";
   const html = shell(
     heading,
-    `<p style="margin:0;font-size:15px;line-height:1.6;color:#33474"'>${lead}</p>
+    `<p style="margin:0;font-size:15px;line-height:1.6;color:#334747;">${lead}</p>
      ${codeBlock(code)}
      <p style="margin:0;font-size:14px;line-height:1.6;color:#5b6b6b;">This code expires in 10 minutes and can be used once. If you didn't request it, you can safely ignore this email${isSignup ? "" : " and should change your password"}.</p>`,
   );
