@@ -133,7 +133,7 @@ export async function sendMail(message: MailMessage): Promise<boolean> {
 
   let session: SmtpSession | undefined;
   try {
-    const { connect } = (await import("cloudflare:sockets")) as {
+    const { connect } = (await import(/* @vite-ignore */ "cloudflare:sockets" as string)) as {
       connect: (
         address: { hostname: string; port: number },
         options?: { secureTransport?: string; allowHalfOpen?: boolean },
