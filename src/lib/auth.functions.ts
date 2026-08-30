@@ -162,11 +162,11 @@ export const verifyEmailCode = createServerFn({ method: "POST" })
       .update({ consumed_at: new Date().toISOString() })
       .eq("id", row.id);
 
-    const patch: Record<string, unknown> = {
+    const patch = {
       mfa_ok_until: new Date(Date.now() + MFA_WINDOW_HOURS * 60 * 60 * 1000).toISOString(),
       last_login_at: new Date().toISOString(),
+      ...(data.purpose === "signup" ? { email_verified: true } : {}),
     };
-    if (data.purpose === "signup") patch["email_verified"] = true;
 
     await supabaseAdmin.from("profiles").update(patch).eq("id", context.userId);
     return { ok: true };
