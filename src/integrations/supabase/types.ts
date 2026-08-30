@@ -334,6 +334,8 @@ export type Database = {
           email: string
           email_verified: boolean
           id: string
+          last_login_at: string | null
+          mfa_ok_until: string | null
         }
         Insert: {
           created_at?: string
@@ -341,6 +343,8 @@ export type Database = {
           email: string
           email_verified?: boolean
           id: string
+          last_login_at?: string | null
+          mfa_ok_until?: string | null
         }
         Update: {
           created_at?: string
@@ -348,6 +352,8 @@ export type Database = {
           email?: string
           email_verified?: boolean
           id?: string
+          last_login_at?: string | null
+          mfa_ok_until?: string | null
         }
         Relationships: []
       }
