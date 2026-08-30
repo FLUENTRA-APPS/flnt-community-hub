@@ -119,9 +119,10 @@ export const replyToTicket = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { requireVerifiedAccount, isAdmin } = await import("./guards.server");
+    const { requireVerifiedAccount } = await import("./guards.server");
     const account = await requireVerifiedAccount(context.userId, context.claims);
-    const admin = await isAdmin(account.userId);
+    const admin = account.isAdmin;
+
 
     const { data: ticket } = await supabaseAdmin
       .from("support_tickets")
