@@ -20,12 +20,12 @@ export const Route = createFileRoute("/verify")({
       {
         name: "description",
         content:
-          "Enter the 6-digit code flnt emailed you to confirm your account.",
+          "Enter the 6-digit code flnt emailed you to confirm your account or sign-in.",
       },
       { property: "og:title", content: "Confirm your flnt code" },
       {
         property: "og:description",
-        content: "Enter the 6-digit code sent to your email.",
+        content: "Six digits stand between you and your flnt account.",
       },
     ],
   }),
@@ -36,20 +36,24 @@ function VerifyPage() {
   const { purpose } = Route.useSearch();
   const navigate = useNavigate();
 
-  const [code, setCode] = useState("");
   const [email, setEmail] = useState("");
+  const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
+  const [resending, setResending] = useState(false);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
 
-    if (code.length !== 6) {
-      toast.error("Enter the 6-digit code.");
+    const cleanEmail = email.trim();
+    const cleanCode = code.trim();
+
+    if (!cleanEmail) {
+      toast.error("Please enter your email address.");
       return;
     }
 
-    if (!email.trim()) {
-      toast.error("Enter the email address you used to create your account.");
+    if (cleanCode.length !== 6) {
+      toast.error("Please enter the 6-digit code.");
       return;
     }
 
@@ -57,16 +61,25 @@ function VerifyPage() {
 
     try {
       const { error } = await supabase.auth.verifyOtp({
-        email: email.trim(),
-        token: code.trim(),
-        type: "signup",
+        email: cleanEmail,
+        token: cleanCode,
+        type: purpose === "signup" ? "signup" : "email",
       });
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
 
-      toast.success("Email confirmed. Welcome to FLNT.");
+      toast.success(
+        purpose === "signup"
+          ? "Email confirmed. Welcome to FLNT!"
+          : "Sign-in confirmed. Welcome back!",
+      );
+
       navigate({ to: "/updates" });
     } catch (error) {
+      console.error("OTP verification error:", error);
+
       toast.error(
         error instanceof Error
           ? error.message
@@ -78,26 +91,36 @@ function VerifyPage() {
   }
 
   async function resend() {
-    if (!email.trim()) {
-      toast.error("Enter your email address first.");
+    const cleanEmail = email.trim();
+
+    if (!cleanEmail) {
+      toast.error("Please enter your email address first.");
       return;
     }
 
+    setResending(true);
+
     try {
       const { error } = await supabase.auth.resend({
-        type: "signup",
-        email: email.trim(),
+        type: purpose === "signup" ? "signup" : "email",
+        email: cleanEmail,
       });
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
 
-      toast.success("A new verification code is on its way.");
+      toast.success("A new verification code has been sent.");
     } catch (error) {
+      console.error("OTP resend error:", error);
+
       toast.error(
         error instanceof Error
           ? error.message
-          : "Couldn't send a new code.",
+          : "Couldn't send a new verification code.",
       );
+    } finally {
+      setResending(false);
     }
   }
 
@@ -117,6 +140,7 @@ function VerifyPage() {
         <form onSubmit={submit} className="mt-8 space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email address</Label>
+
             <Input
               id="email"
               type="email"
@@ -130,11 +154,12 @@ function VerifyPage() {
 
           <div className="space-y-2">
             <Label htmlFor="code">6-digit code</Label>
+
             <Input
               id="code"
               inputMode="numeric"
               autoComplete="one-time-code"
-              pattern="\d{6}"
+              pattern="[0-9]{6}"
               maxLength={6}
               required
               value={code}
@@ -149,7 +174,11 @@ function VerifyPage() {
           <Button
             type="submit"
             className="w-full"
-            disabled={busy || code.length !== 6 || !email.trim()}
+            disabled={
+              busy ||
+              code.length !== 6 ||
+              email.trim().length === 0
+            }
           >
             {busy ? "Checking…" : "Confirm code"}
           </Button>
@@ -159,9 +188,9 @@ function VerifyPage() {
             variant="ghost"
             className="w-full"
             onClick={resend}
-            disabled={!email.trim()}
+            disabled={resending || email.trim().length === 0}
           >
-            Send a new code
+            {resending ? "Sending…" : "Send a new code"}
           </Button>
         </form>
       </div>
