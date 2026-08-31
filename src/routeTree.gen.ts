@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as VerifyRouteImport } from './routes/verify'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminTicketsRouteImport } from './routes/admin.tickets'
 import { Route as TrustIndexRouteImport } from './routes/trust.index'
 import { Route as TrustNameRouteImport } from './routes/trust.$name'
 import { Route as TrustBecomeRouteImport } from './routes/trust.become'
@@ -51,6 +52,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/admin/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminTicketsRoute = AdminTicketsRouteImport.update({
+  id: '/admin/tickets',
+  path: '/admin/tickets',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TrustIndexRoute = TrustIndexRouteImport.update({
   id: '/trust/',
   path: '/trust/',
@@ -83,6 +89,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/support': typeof SupportRoute
   '/verify': typeof VerifyRoute
+  '/admin/tickets': typeof AdminTicketsRoute
   '/trust/$name': typeof TrustNameRoute
   '/trust/become': typeof TrustBecomeRoute
   '/updates/new': typeof UpdatesNewRoute
@@ -96,6 +103,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/support': typeof SupportRoute
   '/verify': typeof VerifyRoute
+  '/admin/tickets': typeof AdminTicketsRoute
   '/trust/$name': typeof TrustNameRoute
   '/trust/become': typeof TrustBecomeRoute
   '/updates/new': typeof UpdatesNewRoute
@@ -110,6 +118,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/support': typeof SupportRoute
   '/verify': typeof VerifyRoute
+  '/admin/tickets': typeof AdminTicketsRoute
   '/trust/$name': typeof TrustNameRoute
   '/trust/become': typeof TrustBecomeRoute
   '/updates/new': typeof UpdatesNewRoute
@@ -125,6 +134,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/support'
     | '/verify'
+    | '/admin/tickets'
     | '/trust/$name'
     | '/trust/become'
     | '/updates/new'
@@ -138,6 +148,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/support'
     | '/verify'
+    | '/admin/tickets'
     | '/trust/$name'
     | '/trust/become'
     | '/updates/new'
@@ -151,6 +162,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/support'
     | '/verify'
+    | '/admin/tickets'
     | '/trust/$name'
     | '/trust/become'
     | '/updates/new'
@@ -165,6 +177,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   SupportRoute: typeof SupportRoute
   VerifyRoute: typeof VerifyRoute
+  AdminTicketsRoute: typeof AdminTicketsRoute
   TrustNameRoute: typeof TrustNameRoute
   TrustBecomeRoute: typeof TrustBecomeRoute
   UpdatesNewRoute: typeof UpdatesNewRoute
@@ -217,6 +230,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/tickets': {
+      id: '/admin/tickets'
+      path: '/admin/tickets'
+      fullPath: '/admin/tickets'
+      preLoaderRoute: typeof AdminTicketsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/trust/': {
       id: '/trust/'
       path: '/trust'
@@ -261,6 +281,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   SupportRoute: SupportRoute,
   VerifyRoute: VerifyRoute,
+  AdminTicketsRoute: AdminTicketsRoute,
   TrustNameRoute: TrustNameRoute,
   TrustBecomeRoute: TrustBecomeRoute,
   UpdatesNewRoute: UpdatesNewRoute,
