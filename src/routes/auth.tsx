@@ -2,7 +2,6 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { requestEmailCode } from "@/lib/auth.functions";
 import { Shell } from "@/components/site-shell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -98,18 +97,17 @@ function AuthForm({ mode }: { mode: "signin" | "signup" }) {
         if (error) throw error;
       }
 
-      const purpose = mode === "signup" ? "signup" : "login";
-      const result = await requestEmailCode({ data: { purpose } });
-      if (!result.sent) {
-        toast.warning(
-          result.reason === "rate_limited"
-            ? "Too many codes requested. Try again in an hour."
-            : "We couldn't send the email right now. Ask the site owner to check the mail configuration.",
-        );
-      } else {
-        toast.success("Check your inbox for a 6-digit code.");
-      }
-      navigate({ to: "/verify", search: { purpose } });
+   if (mode === "signup") {
+  toast.success("Check your inbox for your 6-digit verification code.");
+  navigate({
+    to: "/verify",
+    search: { purpose: "signup" },
+  });
+  return;
+}
+
+toast.success("Signed in successfully.");
+navigate({ to: "/");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Something went wrong.");
     } finally {
