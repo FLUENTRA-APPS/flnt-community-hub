@@ -10,33 +10,180 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CodeRouteImport } from './routes/$code'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as SupportRouteImport } from './routes/support'
+import { Route as VerifyRouteImport } from './routes/verify'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminTicketsRouteImport } from './routes/admin.tickets'
+import { Route as TrustIndexRouteImport } from './routes/trust.index'
+import { Route as TrustNameRouteImport } from './routes/trust.$name'
+import { Route as TrustBecomeRouteImport } from './routes/trust.become'
+import { Route as UpdatesIndexRouteImport } from './routes/updates.index'
+import { Route as UpdatesNewRouteImport } from './routes/updates.new'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CodeRoute = CodeRouteImport.update({
+  id: '/$code',
+  path: '/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportRoute = SupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerifyRoute = VerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminTicketsRoute = AdminTicketsRouteImport.update({
+  id: '/admin/tickets',
+  path: '/admin/tickets',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrustIndexRoute = TrustIndexRouteImport.update({
+  id: '/trust/',
+  path: '/trust/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrustNameRoute = TrustNameRouteImport.update({
+  id: '/trust/$name',
+  path: '/trust/$name',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrustBecomeRoute = TrustBecomeRouteImport.update({
+  id: '/trust/become',
+  path: '/trust/become',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UpdatesIndexRoute = UpdatesIndexRouteImport.update({
+  id: '/updates/',
+  path: '/updates/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UpdatesNewRoute = UpdatesNewRouteImport.update({
+  id: '/updates/new',
+  path: '/updates/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$code': typeof CodeRoute
+  '/auth': typeof AuthRoute
+  '/support': typeof SupportRoute
+  '/verify': typeof VerifyRoute
+  '/admin/tickets': typeof AdminTicketsRoute
+  '/trust/$name': typeof TrustNameRoute
+  '/trust/become': typeof TrustBecomeRoute
+  '/updates/new': typeof UpdatesNewRoute
+  '/admin/': typeof AdminIndexRoute
+  '/trust/': typeof TrustIndexRoute
+  '/updates/': typeof UpdatesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$code': typeof CodeRoute
+  '/auth': typeof AuthRoute
+  '/support': typeof SupportRoute
+  '/verify': typeof VerifyRoute
+  '/admin/tickets': typeof AdminTicketsRoute
+  '/trust/$name': typeof TrustNameRoute
+  '/trust/become': typeof TrustBecomeRoute
+  '/updates/new': typeof UpdatesNewRoute
+  '/admin': typeof AdminIndexRoute
+  '/trust': typeof TrustIndexRoute
+  '/updates': typeof UpdatesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/$code': typeof CodeRoute
+  '/auth': typeof AuthRoute
+  '/support': typeof SupportRoute
+  '/verify': typeof VerifyRoute
+  '/admin/tickets': typeof AdminTicketsRoute
+  '/trust/$name': typeof TrustNameRoute
+  '/trust/become': typeof TrustBecomeRoute
+  '/updates/new': typeof UpdatesNewRoute
+  '/admin/': typeof AdminIndexRoute
+  '/trust/': typeof TrustIndexRoute
+  '/updates/': typeof UpdatesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/$code'
+    | '/auth'
+    | '/support'
+    | '/verify'
+    | '/admin/tickets'
+    | '/trust/$name'
+    | '/trust/become'
+    | '/updates/new'
+    | '/admin/'
+    | '/trust/'
+    | '/updates/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/$code'
+    | '/auth'
+    | '/support'
+    | '/verify'
+    | '/admin/tickets'
+    | '/trust/$name'
+    | '/trust/become'
+    | '/updates/new'
+    | '/admin'
+    | '/trust'
+    | '/updates'
+  id:
+    | '__root__'
+    | '/'
+    | '/$code'
+    | '/auth'
+    | '/support'
+    | '/verify'
+    | '/admin/tickets'
+    | '/trust/$name'
+    | '/trust/become'
+    | '/updates/new'
+    | '/admin/'
+    | '/trust/'
+    | '/updates/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CodeRoute: typeof CodeRoute
+  AuthRoute: typeof AuthRoute
+  SupportRoute: typeof SupportRoute
+  VerifyRoute: typeof VerifyRoute
+  AdminTicketsRoute: typeof AdminTicketsRoute
+  TrustNameRoute: typeof TrustNameRoute
+  TrustBecomeRoute: typeof TrustBecomeRoute
+  UpdatesNewRoute: typeof UpdatesNewRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+  TrustIndexRoute: typeof TrustIndexRoute
+  UpdatesIndexRoute: typeof UpdatesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +195,99 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$code': {
+      id: '/$code'
+      path: '/$code'
+      fullPath: '/$code'
+      preLoaderRoute: typeof CodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/support': {
+      id: '/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof SupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verify': {
+      id: '/verify'
+      path: '/verify'
+      fullPath: '/verify'
+      preLoaderRoute: typeof VerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/tickets': {
+      id: '/admin/tickets'
+      path: '/admin/tickets'
+      fullPath: '/admin/tickets'
+      preLoaderRoute: typeof AdminTicketsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trust/': {
+      id: '/trust/'
+      path: '/trust'
+      fullPath: '/trust/'
+      preLoaderRoute: typeof TrustIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trust/$name': {
+      id: '/trust/$name'
+      path: '/trust/$name'
+      fullPath: '/trust/$name'
+      preLoaderRoute: typeof TrustNameRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trust/become': {
+      id: '/trust/become'
+      path: '/trust/become'
+      fullPath: '/trust/become'
+      preLoaderRoute: typeof TrustBecomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/updates/': {
+      id: '/updates/'
+      path: '/updates'
+      fullPath: '/updates/'
+      preLoaderRoute: typeof UpdatesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/updates/new': {
+      id: '/updates/new'
+      path: '/updates/new'
+      fullPath: '/updates/new'
+      preLoaderRoute: typeof UpdatesNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CodeRoute: CodeRoute,
+  AuthRoute: AuthRoute,
+  SupportRoute: SupportRoute,
+  VerifyRoute: VerifyRoute,
+  AdminTicketsRoute: AdminTicketsRoute,
+  TrustNameRoute: TrustNameRoute,
+  TrustBecomeRoute: TrustBecomeRoute,
+  UpdatesNewRoute: UpdatesNewRoute,
+  AdminIndexRoute: AdminIndexRoute,
+  TrustIndexRoute: TrustIndexRoute,
+  UpdatesIndexRoute: UpdatesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
