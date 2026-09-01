@@ -1,43 +1,39 @@
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { currentUserId, findUserById, isAdmin, mfaFresh } from "./auth-core.server";
+import { mutateDoc, newId } from "./store.server";
+import type { AuditDoc, UserRecord } from "./data-types";
 
 export type AccountGate = {
   userId: string;
   email: string;
   displayName: string;
   isAdmin: boolean;
+  user: UserRecord;
 };
 
+export async function requireUser(): Promise<UserRecord> {
+  const id = await currentUserId();
+  if (!id) throw new Error("Please sign in to continue.");
+  const user = await findUserById(id);
+  if (!user) throw new Error("Please sign in to continue.");
+  return user;
+}
+
 /** Requires a signed-in, email-verified account with a fresh login confirmation. */
-export async function requireVerifiedAccount(
-  userId: string,
-  claims: Record<string, unknown>,
-): Promise<AccountGate> {
-  const { data: profile } = await supabaseAdmin
-    .from("profiles")
-    .select("email, display_name, email_verified, mfa_ok_until")
-    .eq("id", userId)
-    .maybeSingle();
-
-  if (!profile) throw new Error("Your profile is not set up yet. Sign in again.");
-  if (!profile.email_verified) throw new Error("Verify your email address to use this feature.");
-  const mfaOk = profile.mfa_ok_until ? new Date(profile.mfa_ok_until).getTime() > Date.now() : false;
-  if (!mfaOk) throw new Error("Confirm this sign-in with the code we emailed you.");
-
-  const { data: roles } = await supabaseAdmin.from("user_roles").select("role").eq("user_id", userId);
-
+export async function requireVerifiedAccount(): Promise<AccountGate> {
+  const user = await requireUser();
+  if (!user.emailVerified) throw new Error("Verify your email address to use this feature.");
+  if (!mfaFresh(user)) throw new Error("Confirm this sign-in with the code we emailed you.");
   return {
-    userId,
-    email: profile.email || String(claims["email"] ?? ""),
-    displayName: profile.display_name,
-    isAdmin: (roles ?? []).some((r) => r.role === "admin"),
+    userId: user.id,
+    email: user.email,
+    displayName: user.displayName,
+    isAdmin: isAdmin(user),
+    user,
   };
 }
 
-export async function requireAdmin(
-  userId: string,
-  claims: Record<string, unknown>,
-): Promise<AccountGate> {
-  const account = await requireVerifiedAccount(userId, claims);
+export async function requireAdmin(): Promise<AccountGate> {
+  const account = await requireVerifiedAccount();
   if (!account.isAdmin) throw new Error("Forbidden");
   return account;
 }
@@ -52,14 +48,19 @@ export async function writeAudit(entry: {
   newValue?: unknown;
   reason: string;
 }): Promise<void> {
-  await supabaseAdmin.from("admin_audit_log").insert({
-    actor_id: entry.actorId,
-    actor_email: entry.actorEmail,
-    action: entry.action,
-    target_type: entry.targetType,
-    target_id: entry.targetId,
-    prior_value: (entry.priorValue ?? null) as never,
-    new_value: (entry.newValue ?? null) as never,
-    reason: entry.reason,
+  await mutateDoc<AuditDoc, void>("audit.json", (doc) => {
+    doc.entries.unshift({
+      id: newId(),
+      actorId: entry.actorId,
+      actorEmail: entry.actorEmail,
+      action: entry.action,
+      targetType: entry.targetType,
+      targetId: entry.targetId,
+      priorValue: entry.priorValue ?? null,
+      newValue: entry.newValue ?? null,
+      reason: entry.reason,
+      createdAt: new Date().toISOString(),
+    });
+    doc.entries = doc.entries.slice(0, 500);
   });
 }
