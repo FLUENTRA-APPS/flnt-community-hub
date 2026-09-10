@@ -90,12 +90,9 @@ export const requestEmailCode = createServerFn({ method: "POST" })
     const { mutateDoc, newId } = await import("./store.server");
     const { sha256, randomCode } = await import("./server-shared.server");
     const { sendVerificationCode } = await import("./emails.server");
-    const { type CodesDoc } = { type: null } as never;
-    void CodesDoc;
 
     const user = await requireUser();
-    const codeHash = await sha256("");
-    void codeHash;
+
 
     const code = randomCode(6);
     const rateLimited = await mutateDoc<import("./data-types").CodesDoc, boolean>(
