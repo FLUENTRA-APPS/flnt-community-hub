@@ -74,7 +74,8 @@ class SmtpSession {
     await this.writer.write(this.encoder.encode(`${command}\r\n`));
     const reply = await this.readReply();
     if (!expected.includes(reply.code)) {
-      throw new Error(`SMTP command rejected with status ${reply.code}`);
+      const verb = command.split(/[\s:]/)[0] ?? "command";
+      throw new Error(`SMTP ${verb} rejected with status ${reply.code}`);
     }
     return reply;
   }
