@@ -2,7 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { Menu } from "lucide-react";
 import { useState, type ReactNode } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { signOut as signOutFn } from "@/lib/auth.functions";
 import { useSession } from "@/hooks/use-session";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -30,7 +30,7 @@ export function SiteHeader() {
   async function signOut() {
     await queryClient.cancelQueries();
     queryClient.clear();
-    await supabase.auth.signOut();
+    await signOutFn();
     navigate({ to: "/", replace: true });
   }
 
