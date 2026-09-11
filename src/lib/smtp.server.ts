@@ -113,6 +113,69 @@ function dotStuff(body: string): string {
   return body.replace(/\r?\n/g, "\r\n").replace(/^\./gm, "..");
 }
 
+/**
+ * Opens a TCP socket. Uses Cloudflare's socket API when available (edge
+ * runtimes) and falls back to Node's net/tls modules elsewhere.
+ */
+async function openSocket(host: string, port: number, implicitTls: boolean): Promise<Socket> {
+  try {
+    const mod = (await import(/* @vite-ignore */ "cloudflare:sockets" as string)) as {
+      connect: (
+        address: { hostname: string; port: number },
+        options?: { secureTransport?: string; allowHalfOpen?: boolean },
+      ) => Socket;
+    };
+    return mod.connect(
+      { hostname: host, port },
+      { secureTransport: implicitTls ? "on" : "starttls", allowHalfOpen: false },
+    );
+  } catch {
+    return nodeSocket(host, port, implicitTls);
+  }
+}
+
+async function nodeSocket(host: string, port: number, implicitTls: boolean): Promise<Socket> {
+  const net = await import(/* @vite-ignore */ "node:net" as string);
+  const tls = await import(/* @vite-ignore */ "node:tls" as string);
+  const { Duplex } = await import(/* @vite-ignore */ "node:stream" as string);
+
+  type NodeDuplex = {
+    on: (event: string, cb: (arg?: unknown) => void) => void;
+    once: (event: string, cb: (arg?: unknown) => void) => void;
+    destroy: () => void;
+    end: () => void;
+  };
+
+  function wrap(raw: NodeDuplex): Socket {
+    const web = Duplex.toWeb(raw as never) as {
+      readable: ReadableStream<Uint8Array>;
+      writable: WritableStream<Uint8Array>;
+    };
+    return {
+      readable: web.readable,
+      writable: web.writable,
+      startTls: () =>
+        wrap(
+          tls.connect({ socket: raw as never, servername: host, rejectUnauthorized: true }) as never,
+        ),
+      close: async () => {
+        raw.destroy();
+      },
+    };
+  }
+
+  const raw = implicitTls
+    ? tls.connect({ host, port, servername: host })
+    : net.connect({ host, port });
+
+  await new Promise<void>((resolve, reject) => {
+    raw.once(implicitTls ? "secureConnect" : "connect", () => resolve());
+    raw.once("error", (err: unknown) => reject(err));
+  });
+
+  return wrap(raw as never);
+}
+
 export type MailMessage = {
   to: string;
   subject: string;
