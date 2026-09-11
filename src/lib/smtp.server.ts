@@ -133,18 +133,8 @@ export async function sendMail(message: MailMessage): Promise<boolean> {
 
   let session: SmtpSession | undefined;
   try {
-    const { connect } = (await import(/* @vite-ignore */ "cloudflare:sockets" as string)) as {
-      connect: (
-        address: { hostname: string; port: number },
-        options?: { secureTransport?: string; allowHalfOpen?: boolean },
-      ) => Socket;
-    };
-
     const implicitTls = config.port === 465;
-    const socket = connect(
-      { hostname: config.host, port: config.port },
-      { secureTransport: implicitTls ? "on" : "starttls", allowHalfOpen: false },
-    );
+    const socket = await openSocket(config.host, config.port, implicitTls);
 
     session = new SmtpSession(socket);
     const greeting = await session.readReply();
